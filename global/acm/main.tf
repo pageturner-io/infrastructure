@@ -13,4 +13,10 @@ resource "aws_acm_certificate_validation" "pageturner_io" {
   validation_record_fqdns = [
     "${var.pageturner_io_certificate_validation_fqdn}",
   ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  provider = "aws.cloudfront"
 }

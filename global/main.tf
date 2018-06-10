@@ -42,6 +42,8 @@ module "cloudfront" {
 module "route53" {
   source = "./route53"
 
-  cloudfront_distribution_website_domain      = "${module.cloudfront.cloudfront_distribution_website_domain}"
+  cloudfront_distribution_website_domain  = "${module.cloudfront.cloudfront_distribution_website_domain}"
+  cloudfront_distribution_website_zone_id = "${module.cloudfront.cloudfront_distribution_website_zone_id}"
+
   pageturner_io_certificate_validation_option = "${module.acm.pageturner_io_certificate_validation_option}"
 }
