@@ -43,7 +43,10 @@ resource "aws_cloudfront_distribution" "website" {
     response_page_path    = "/index.html"
   }
 
-  aliases = ["${var.www_domain_name}"]
+  aliases = [
+    "${var.domain_name}",
+    "${var.www_domain_name}",
+  ]
 
   restrictions {
     geo_restriction {

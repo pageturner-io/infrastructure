@@ -11,6 +11,15 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
+resource "aws_s3_bucket" "builds" {
+  bucket = "pageturner-cd-builds"
+  acl    = "private"
+
+  tags {
+    Name = "CI/CD pipeline artifacts"
+  }
+}
+
 resource "aws_s3_bucket" "website" {
   bucket = "${var.www_domain_name}"
 
