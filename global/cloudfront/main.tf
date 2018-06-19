@@ -36,6 +36,39 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
+  # HTML files
+  cache_behavior {
+    path_pattern     = "*.html"
+    target_origin_id = "${var.www_domain_name}"
+
+    allowed_methods = [
+      "GET",
+      "HEAD",
+      "OPTIONS",
+    ]
+
+    cached_methods = [
+      "GET",
+      "HEAD",
+    ]
+
+    compress         = true
+    smooth_streaming = false
+
+    forwarded_values {
+      cookies {
+        forward = "none"
+      }
+
+      query_string = true
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 0
+    max_ttl                = 0
+  }
+
   custom_error_response {
     error_caching_min_ttl = 0
     error_code            = 404
