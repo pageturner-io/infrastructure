@@ -5,7 +5,7 @@ data "template_file" "verification_message_template_content" {
 resource "aws_cognito_user_pool" "pageturner_production" {
   name = "pageturner-production"
 
-  alias_attributes         = ["email", "preferred_username"]
+  username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
 
   verification_message_template {
@@ -21,6 +21,32 @@ resource "aws_cognito_user_pool" "pageturner_production" {
     require_uppercase = false
   }
 
+  schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "email"
+    required                 = true
+
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 256
+    }
+  }
+
+  schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "name"
+    required                 = true
+
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 256
+    }
+  }
+
   tags {
     "Environment" = "production"
   }
@@ -32,7 +58,7 @@ resource "aws_cognito_identity_provider" "google_provider_production" {
   provider_type = "Google"
 
   provider_details {
-    authorize_scopes              = "email"
+    authorize_scopes              = "profile email"
     client_id                     = "${var.google_oauth_client_id}"
     client_secret                 = "${var.google_oauth_client_secret}"
     attributes_url                = "https://people.googleapis.com/v1/people/me?personFields="
@@ -45,6 +71,7 @@ resource "aws_cognito_identity_provider" "google_provider_production" {
 
   attribute_mapping {
     email    = "email"
+    name     = "name"
     username = "sub"
   }
 }
@@ -67,6 +94,24 @@ resource "aws_cognito_identity_provider" "facebook_provider_production" {
 
   attribute_mapping {
     email    = "email"
+    name     = "name"
     username = "id"
   }
+}
+
+resource "aws_cognito_user_pool_client" "pageturner_web_production" {
+  name = "pageturner-web-production"
+
+  user_pool_id = "${aws_cognito_user_pool.pageturner_production.id}"
+
+  supported_identity_providers = [
+    "COGNITO",
+    "Facebook",
+    "Google",
+  ]
+
+  depends_on = [
+    "aws_cognito_identity_provider.facebook_provider_production",
+    "aws_cognito_identity_provider.google_provider_production",
+  ]
 }
